@@ -1,0 +1,9 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\keyboard.obj",
+".\Objects\iic.obj",
+".\Objects\pcf8591.obj",
+".\Objects\led.obj",
+".\Objects\init.obj" 
+TO ".\Objects\project" 
+PRINT(".\Listings\project.m51") RAMSIZE(256) 
