@@ -1,0 +1,53 @@
+C51 COMPILER V9.60.0.0   INIT                                                              03/31/2023 20:40:05 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE INIT
+OBJECT MODULE PLACED IN .\Objects\init.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE ..\Include\init.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\User;..\Include;..\Dri
+                    -ver) DEBUG OBJECTEXTEND PRINT(.\Listings\init.lst) OBJECT(.\Objects\init.obj)
+
+line level    source
+
+   1          #include "init.h"
+   2          
+   3          void SelectHC138(unsigned char channel)
+   4          {
+   5   1              P2 &= 0x1F;
+   6   1              P2 |= (channel & 0x07) << 5;
+   7   1      }
+   8          
+   9          void Init_BUZZ_LED()
+  10          {
+  11   1              SelectHC138(4);
+  12   1              P0 = 0xFF;
+  13   1              SelectHC138(5);
+  14   1              P0 = 0x00;
+  15   1              SelectHC138(0);
+  16   1      }
+  17          
+  18          void Timer0Init(void)           //1毫秒@12.000MHz
+  19          {
+  20   1              AUXR |= 0x80;           //定时器时钟1T模式
+  21   1              TMOD &= 0xF0;           //设置定时器模式
+  22   1              TL0 = 0x20;             //设置定时初始值
+  23   1              TH0 = 0xD1;             //设置定时初始值
+  24   1              TF0 = 0;                //清除TF0标志
+  25   1              TR0 = 1;                //定时器0开始计时
+  26   1              ET0 = 1;
+  27   1              EA = 1;
+  28   1      }
+  29          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     54    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

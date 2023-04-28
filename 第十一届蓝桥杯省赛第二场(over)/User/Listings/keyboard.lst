@@ -1,0 +1,82 @@
+C51 COMPILER V9.60.0.0   KEYBOARD                                                          03/31/2023 20:40:04 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE KEYBOARD
+OBJECT MODULE PLACED IN .\Objects\keyboard.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE ..\Driver\keyboard.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\User;..\Include;..\
+                    -Driver) DEBUG OBJECTEXTEND PRINT(.\Listings\keyboard.lst) OBJECT(.\Objects\keyboard.obj)
+
+line level    source
+
+   1          #include "keyboard.h"
+   2          
+   3          unsigned char code Key_Map[4] = {'1','2','3','4'};
+   4          unsigned char Key_Sta[4] = {1,1,1,1};
+   5          
+   6          extern void KeyAction(unsigned char keycode);
+   7          
+   8          void KeyDriver()
+   9          {
+  10   1              unsigned char i;
+  11   1              static unsigned char backup[4] = {1,1,1,1};
+  12   1              
+  13   1              for(i = 0; i < 4; i++)
+  14   1              {
+  15   2                      if(backup[i] != Key_Sta[i])
+  16   2                      {
+  17   3                              if(backup[i] != 0)
+  18   3                              {
+  19   4                                      KeyAction(Key_Map[i]);
+  20   4                              }
+  21   3                              backup[i] = Key_Sta[i];
+  22   3                      }
+  23   2              }
+  24   1      }
+  25          
+  26          void KeyScan()
+  27          {
+  28   1              unsigned char i;
+  29   1              static unsigned char keyout = 0;
+  30   1              static unsigned char Key_Buff[4] = {0xFF,0xFF,0xFF,0xFF};
+  31   1              
+  32   1              switch(keyout)
+  33   1              {
+  34   2                      case 0: Key_Buff[0] = Key_Buff[0] << 1 | KEY_OUT_1; break;
+  35   2                      case 1: Key_Buff[1] = Key_Buff[1] << 1 | KEY_OUT_2; break;
+  36   2                      case 2: Key_Buff[2] = Key_Buff[2] << 1 | KEY_OUT_3; break;
+  37   2                      case 3: Key_Buff[3] = Key_Buff[3] << 1 | KEY_OUT_4; break;
+  38   2                      default: break;
+  39   2              }
+  40   1              
+  41   1              for(i = 0; i < 4; i++)
+  42   1              {
+  43   2                      if((Key_Buff[keyout] & 0x0F) == 0x00)
+  44   2                      {
+  45   3                              Key_Sta[keyout] = 0;
+  46   3                      }
+  47   2                      else if((Key_Buff[keyout] & 0x0F) == 0x0F)
+  48   2                      {
+  49   3                              Key_Sta[keyout] = 1;
+  50   3                      }
+  51   2              }
+  52   1              
+  53   1              keyout++;
+  54   1              keyout &= 0x03;
+C51 COMPILER V9.60.0.0   KEYBOARD                                                          03/31/2023 20:40:04 PAGE 2   
+
+  55   1      }
+  56                  
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    188    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
