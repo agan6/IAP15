@@ -1,0 +1,215 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              04/06/2023 19:28:00 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver;..\Include;..\User) DEBUG 
+                    -OBJECTEXTEND PRINT(.\Listings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          bit flag100ms = 0;
+   4          bit Set_Vep_Mode = 0;
+   5          bit Sonic_Mode = 0;
+   6          unsigned int Read_vep;
+   7          unsigned char DisplayMode = 0;
+   8          unsigned char Vep_Max = 45;
+   9          unsigned char Vep_Min = 5;
+  10          unsigned char Vep_Max_Enter = 45;
+  11          unsigned char Vep_Min_Enter = 5;
+  12          float dat;
+  13          extern unsigned int distance;
+  14          
+  15          void Working();
+  16          
+  17          void main()
+  18          {
+  19   1          Init_BUZZ_LED();
+  20   1          Timer0Init();
+  21   1          while(1)
+  22   1          {
+  23   2              Working();
+  24   2          }
+  25   1      }
+  26          
+  27          void Working()
+  28          {
+  29   1              KeyDriver();
+  30   1          if(flag100ms == 1)
+  31   1          {
+  32   2              flag100ms = 0;
+  33   2              Read_vep = AD_Read(0x43);
+  34   2              Read_vep = Read_vep * 100 / 51;
+  35   2                      if((Read_vep > (Vep_Min_Enter * 10)) && (Read_vep < (Vep_Max_Enter * 10)))
+  36   2                      {
+  37   3                              Sonic_Mode = 0;
+  38   3                              Get_Distance();
+  39   3                      }
+  40   2                      else
+  41   2                      {
+  42   3                              Sonic_Mode = 1;
+  43   3                      }
+  44   2                      if(Sonic_Mode == 0)
+  45   2                      {
+  46   3                              if(distance <= 20)
+  47   3                              {
+  48   4                                      DA_Write(100 * 51 / 100);
+  49   4                              }
+  50   3                              else if(distance >= 500)
+  51   3                              {
+  52   4                                      DA_Write(500 * 51 / 100);
+  53   4                              }
+  54   3                              else
+C51 COMPILER V9.60.0.0   MAIN                                                              04/06/2023 19:28:00 PAGE 2   
+
+  55   3                              {
+  56   4                                      dat = 400 / 60 * distance - 100 / 3;
+  57   4                                      dat = dat *
+  58   4                                      51 / 100;
+  59   4                                      DA_Write(dat);
+  60   4                              }                               
+  61   3                      }
+  62   2                      else
+  63   2                      {
+  64   3                              DA_Write(0);
+  65   3                      }
+  66   2                      Led_Single();
+  67   2                      if(DisplayMode == 0)
+  68   2                      {       
+  69   3                              DisplayMode0();
+  70   3                      }
+  71   2                      else if(DisplayMode == 1)
+  72   2                      {
+  73   3                              DisplayMode1();
+  74   3                      }
+  75   2                      else if(DisplayMode == 2)
+  76   2                      {
+  77   3                              DisplayMode2();
+  78   3                      }
+  79   2          }
+  80   1      }
+  81          
+  82          void KeyAction(unsigned char keycode)
+  83          {
+  84   1              if(DisplayMode == 0)
+  85   1              {
+  86   2                      if(keycode == '4')
+  87   2                      {
+  88   3                              DisplayMode = 1;
+  89   3                      }
+  90   2              }
+  91   1              else if(DisplayMode == 1)
+  92   1              {
+  93   2                      if(keycode == '4')
+  94   2                      {
+  95   3                              DisplayMode = 2;
+  96   3                              Set_Vep_Mode = 0;
+  97   3                      }
+  98   2              }
+  99   1              else if(DisplayMode == 2)
+ 100   1              {
+ 101   2                      if(keycode == '4')
+ 102   2                      {
+ 103   3                              DisplayMode = 0;
+ 104   3                              Vep_Max_Enter = Vep_Max;
+ 105   3                              Vep_Min_Enter = Vep_Min;
+ 106   3                      }
+ 107   2                      if(Set_Vep_Mode == 0)
+ 108   2                      {
+ 109   3                              if(keycode == '3')
+ 110   3                              {
+ 111   4                                      Set_Vep_Mode = 1;
+ 112   4                              }
+ 113   3                              else if(keycode == '2')
+ 114   3                              {
+ 115   4                                      Vep_Max += 5;
+ 116   4                                      if(Vep_Max > 50)
+C51 COMPILER V9.60.0.0   MAIN                                                              04/06/2023 19:28:00 PAGE 3   
+
+ 117   4                                      {
+ 118   5                                              Vep_Max = 5;
+ 119   5                                      }
+ 120   4                                      else if(Vep_Max < 5)
+ 121   4                                      {
+ 122   5                                              Vep_Max = 50;
+ 123   5                                      }
+ 124   4                              }
+ 125   3                              else if(keycode == '1')
+ 126   3                              {
+ 127   4                                      Vep_Max -= 5;
+ 128   4                                      if(Vep_Max > 50)
+ 129   4                                      {
+ 130   5                                              Vep_Max = 5;
+ 131   5                                      }
+ 132   4                                      else if(Vep_Max < 5)
+ 133   4                                      {
+ 134   5                                              Vep_Max = 50;
+ 135   5                                      }
+ 136   4                              }
+ 137   3                      }
+ 138   2                      else if(Set_Vep_Mode == 1)
+ 139   2                      {
+ 140   3                              if(keycode == '3')
+ 141   3                              {
+ 142   4                                      Set_Vep_Mode = 0;
+ 143   4                              }
+ 144   3                              else if(keycode == '2')
+ 145   3                              {
+ 146   4                                      Vep_Min += 5;
+ 147   4                                      if(Vep_Min > 50)
+ 148   4                                      {
+ 149   5                                              Vep_Min = 5;
+ 150   5                                      }
+ 151   4                                      else if(Vep_Min < 5)
+ 152   4                                      {
+ 153   5                                              Vep_Min = 50;
+ 154   5                                      }
+ 155   4                              }
+ 156   3                              else if(keycode == '1')
+ 157   3                              {
+ 158   4                                      Vep_Min -= 5;
+ 159   4                                      if(Vep_Min > 50)
+ 160   4                                      {
+ 161   5                                              Vep_Min = 5;
+ 162   5                                      }
+ 163   4                                      else if(Vep_Min < 5)
+ 164   4                                      {
+ 165   5                                              Vep_Min = 50;
+ 166   5                                      }
+ 167   4                              }
+ 168   3                      }
+ 169   2              }
+ 170   1      }
+ 171          
+ 172          void Timer0Handle() interrupt 1
+ 173          {
+ 174   1          static unsigned char cnt_100ms = 0;
+ 175   1      
+ 176   1          Display();
+ 177   1              KeyScan();
+ 178   1      
+C51 COMPILER V9.60.0.0   MAIN                                                              04/06/2023 19:28:00 PAGE 4   
+
+ 179   1          cnt_100ms++;
+ 180   1          if(cnt_100ms >= 200)
+ 181   1          {
+ 182   2              cnt_100ms = 0;
+ 183   2              flag100ms = 1;
+ 184   2          }
+ 185   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    546    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
