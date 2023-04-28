@@ -1,0 +1,101 @@
+C51 COMPILER V9.60.0.0   KEYBOARD                                                          04/03/2023 18:25:31 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE KEYBOARD
+OBJECT MODULE PLACED IN .\Objects\keyboard.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE ..\Driver\keyboard.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver;..\Include;.
+                    -.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\keyboard.lst) OBJECT(.\Objects\keyboard.obj)
+
+line level    source
+
+   1          #include "keyboard.h"
+   2          
+   3          extern void KeyAction(unsigned char keycode);
+   4          
+   5          unsigned char code Key_Map[4][4] = {
+   6              {'1','2','3','A'},
+   7                  {'4','5','6','B'},
+   8                  {'7','8','9','C'},
+   9                  {'+','0','-','D'}
+  10          };
+  11          unsigned char Key_Sta[4][4] = {
+  12              {1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}
+  13          };
+  14          
+  15          void KeyDriver()
+  16          {
+  17   1          unsigned char i,j;
+  18   1          static unsigned char backup[4][4] = {
+  19   1              {1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}
+  20   1          };
+  21   1      
+  22   1          for(i = 0; i < 4; i++)
+  23   1          {
+  24   2              for(j = 0; j < 4; j++)
+  25   2              {
+  26   3                  if(backup[i][j] != Key_Sta[i][j])
+  27   3                  {
+  28   4                      if(backup[i][j] != 0)
+  29   4                      {
+  30   5                                              KeyAction(Key_Map[i][j]);
+  31   5                      }
+  32   4                      backup[i][j] = Key_Sta[i][j];
+  33   4                  }
+  34   3              }
+  35   2          }
+  36   1      }
+  37          
+  38          void KeyScan()
+  39          {
+  40   1          unsigned char i;
+  41   1          static unsigned char Key_Buff[4][4] ={
+  42   1              {0xFF,0xFF,0xFF,0xFF},{0xFF,0xFF,0xFF,0xFF},
+  43   1              {0xFF,0xFF,0xFF,0xFF},{0xFF,0xFF,0xFF,0xFF}
+  44   1          };
+  45   1          static unsigned char keyout;
+  46   1      
+  47   1          Key_Buff[keyout][0] = Key_Buff[keyout][0] << 1 | KEY_IN_1;
+  48   1          Key_Buff[keyout][1] = Key_Buff[keyout][1] << 1 | KEY_IN_2;
+  49   1          Key_Buff[keyout][2] = Key_Buff[keyout][2] << 1 | KEY_IN_3;
+  50   1          Key_Buff[keyout][3] = Key_Buff[keyout][3] << 1 | KEY_IN_4;
+  51   1      
+  52   1          for(i = 0; i < 4; i++)
+  53   1          {
+  54   2              if((Key_Buff[keyout][i] & 0x0F) == 0x00)
+C51 COMPILER V9.60.0.0   KEYBOARD                                                          04/03/2023 18:25:31 PAGE 2   
+
+  55   2              {
+  56   3                  Key_Sta[keyout][i] = 0;
+  57   3              }
+  58   2              else if((Key_Buff[keyout][i] & 0x0F) == 0x0F)
+  59   2              {
+  60   3                  Key_Sta[keyout][i] = 1;
+  61   3              }
+  62   2          }
+  63   1              
+  64   1              keyout++;
+  65   1          keyout &= 0x03;
+  66   1      
+  67   1          switch(keyout)
+  68   1          {
+  69   2              case 0: KEY_OUT_4 = 1; KEY_OUT_1 = 0; break;
+  70   2              case 1: KEY_OUT_1 = 1; KEY_OUT_2 = 0; break;
+  71   2              case 2: KEY_OUT_2 = 1; KEY_OUT_3 = 0; break;
+  72   2              case 3: KEY_OUT_3 = 1; KEY_OUT_4 = 0; break;
+  73   2                      default: break;
+  74   2          }
+  75   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    352    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     49       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
