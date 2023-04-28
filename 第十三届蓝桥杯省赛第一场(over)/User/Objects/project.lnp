@@ -1,0 +1,9 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\led.obj",
+".\Objects\keyboard.obj",
+".\Objects\ds1302.obj",
+".\Objects\onewire.obj",
+".\Objects\init.obj" 
+TO ".\Objects\project" 
+PRINT(".\Listings\project.m51") RAMSIZE(256) 
