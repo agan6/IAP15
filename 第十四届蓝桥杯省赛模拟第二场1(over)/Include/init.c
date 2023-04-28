@@ -1,0 +1,91 @@
+#include "init.h"
+
+unsigned char xdata UartRecv[20] = {0};
+unsigned char index = 0;
+extern unsigned int tempbuf;
+extern unsigned int Read_Vep;
+
+void SelectHC138(unsigned char channel)
+{
+	P2 &= 0x1F;
+	P2 |= (channel & 0x07) << 5;
+}
+
+void Init_BUZZ_LED()
+{
+	SelectHC138(4);
+	P0 = 0xFF;
+	SelectHC138(5);
+	P0 = 0x00;
+	SelectHC138(0);
+}
+
+void Timer0Init(void)		//1毫秒@12.000MHz
+{
+	AUXR |= 0x80;		//定时器时钟1T模式
+	TMOD &= 0xF0;		//设置定时器模式
+	TL0 = 0x20;		//设置定时初始值
+	TH0 = 0xD1;		//设置定时初始值
+	TF0 = 0;		//清除TF0标志
+	TR0 = 1;		//定时器0开始计时
+	ET0 = 1;
+}
+
+void UartInit(void)		//9600bps@12.000MHz
+{
+	SCON = 0x50;		//8位数据,可变波特率
+	AUXR |= 0x01;		//串口1选择定时器2为波特率发生器
+	AUXR |= 0x04;		//定时器时钟1T模式
+	T2L = 0xC7;		//设置定时初始值
+	T2H = 0xFE;		//设置定时初始值
+	AUXR |= 0x10;		//定时器2开始计时
+	ES = 1;
+}
+
+void SendByte(unsigned char dat)
+{
+	SBUF = dat;
+	while(TI == 0);
+	TI = 0;
+}
+
+void SendString(unsigned char *str)
+{
+	while(*str != '\0')
+	{
+		SendByte(*str++);
+	}
+}
+
+void UartHandle() interrupt 4
+{
+	if(RI == 1)
+	{
+		UartRecv[index] = SBUF;
+		index++;
+		RI = 0;
+	}
+}
+
+void BUZZ_RELAY()
+{
+	P0 = 0x00;
+	SelectHC138(5);
+	if(tempbuf >= 280)
+	{
+		P04 = 1;
+	}
+	else
+	{
+		P04 = 0;
+	}
+	if(Read_Vep > 360)
+	{
+		P06 = 1;
+	}
+	else
+	{
+		P06 = 0;
+	}
+	SelectHC138(0);
+}
